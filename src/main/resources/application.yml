@@ -1,0 +1,56 @@
+server.port: 8080
+
+app.eureka-service.host.name: localhost
+app.farmer-composite-service.host.name: localhost
+
+spring:
+  application.name: kissan-cloud-gateway-service
+
+  profiles.active: docker
+
+  cloud.gateway.routes:
+
+    - id: farmer-composite-service
+      uri: lb://${app.farmer-composite-service.host.name}
+      predicates:
+      - Path=/farmer-composite/**
+
+    - id: eureka-api
+      uri: http://${app.eureka-service.host.name}:8761
+      predicates:
+      - Path=/eureka/api/{segment}
+      filters:
+      - SetPath=/eureka/{segment}
+
+    - id: eureka-web-start
+      uri: http://${app.eureka-service.host.name}:8761
+      predicates:
+      - Path=/eureka/web
+      filters:
+      - SetPath=/
+
+#    - id: eureka-web-other
+#      uri: http://${app.eureka-service.host.name}:8761
+#      predicates:
+#      - Path=/eureka/**
+
+eureka:
+  client:
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+    serviceUrl:
+      defaultZone: http://${app.eureka-service.host.name}:8761/eureka/
+  instance:
+    leaseExpirationDurationInSeconds: 5
+    leaseRenewalIntervalInSeconds: 5
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
+    org.springframework.cloud.gateway: TRACE
+
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
+
+

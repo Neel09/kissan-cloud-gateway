@@ -1,0 +1,5 @@
+eureka.client.serviceUrl:
+      defaultZone: http://eureka-service:8761/eureka/
+      
+app.eureka-service.host.name: eureka-service
+app.farmer-composite-service.host.name: farmer-composite-service
